@@ -303,23 +303,17 @@
       const [tickerInput, setTickerInput] = useState("AAPL");
       
       // Authentication State
-      const DEFAULT_USER = {
-        name: "Santosh Bhagat",
-        email: "santoshkirshnabhagat@gmail.com",
-        token: "token-santosh-default"
-      };
-
       const [currentUser, setCurrentUser] = useState(() => {
         try {
           const saved = localStorage.getItem("stock_user");
-          return saved ? JSON.parse(saved) : DEFAULT_USER;
+          return saved ? JSON.parse(saved) : null;
         } catch {
-          return DEFAULT_USER;
+          return null;
         }
       });
-      const [showAuthModal, setShowAuthModal] = useState(false);
+      const [showAuthModal, setShowAuthModal] = useState(() => !localStorage.getItem("stock_user"));
       const [authTab, setAuthTab] = useState("login"); // "login" | "register"
-      const [authForm, setAuthForm] = useState({ name: "", email: "santoshkirshnabhagat@gmail.com", password: "" });
+      const [authForm, setAuthForm] = useState({ name: "", email: "santoshkirshnabhagat@gmail.com", password: "password123" });
       const [authError, setAuthError] = useState("");
       const [authLoading, setAuthLoading] = useState(false);
 
@@ -397,8 +391,14 @@
       const handleLogin = async (email, password) => {
         setAuthLoading(true);
         setAuthError("");
-        const loginEmail = (email || authForm.email || "santoshkirshnabhagat@gmail.com").trim().toLowerCase();
-        const loginPass = password || authForm.password || "password123";
+        const loginEmail = (email || authForm.email).trim().toLowerCase();
+        const loginPass = password || authForm.password;
+
+        if (!loginEmail || !loginPass) {
+          setAuthError("Please enter both email address and password.");
+          setAuthLoading(false);
+          return;
+        }
 
         try {
           const res = await fetch("/api/auth/login", {
@@ -407,57 +407,53 @@
             body: JSON.stringify({ email: loginEmail, password: loginPass })
           });
           const data = await res.json();
-          if (res.ok && data.user) {
-            setCurrentUser(data.user);
-            setShowAuthModal(false);
-            showToast(`Welcome back, ${data.user.name}!`);
-            handleAnalyze(tickerInput || "AAPL", data.user.token);
-            return;
+          if (!res.ok) {
+            throw new Error(data.detail || "Authentication failed.");
           }
-        } catch (err) {
-          console.warn("API Login fallback:", err);
-        }
 
-        // Seamless fallback session creation
-        const userName = loginEmail.split("@")[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const userObj = { name: userName || "Trader", email: loginEmail, token: `token-${Date.now()}` };
-        setCurrentUser(userObj);
-        setShowAuthModal(false);
-        showToast(`Signed in as ${userObj.name}!`);
-        handleAnalyze(tickerInput || "AAPL", userObj.token);
-        setAuthLoading(false);
+          setCurrentUser(data.user);
+          setShowAuthModal(false);
+          showToast(`Welcome back, ${data.user.name}!`);
+          handleAnalyze(tickerInput || "AAPL", data.user.token);
+        } catch (err) {
+          setAuthError(err.message || "Failed to sign in. Please verify credentials.");
+        } finally {
+          setAuthLoading(false);
+        }
       };
 
       const handleRegister = async () => {
         setAuthLoading(true);
         setAuthError("");
-        const regEmail = (authForm.email || "santoshkirshnabhagat@gmail.com").trim().toLowerCase();
-        const regName = authForm.name.trim() || regEmail.split("@")[0].capitalize();
+        const regEmail = authForm.email.trim().toLowerCase();
+        const regPass = authForm.password;
+
+        if (!regEmail || !regPass) {
+          setAuthError("Please provide a valid email and password (min 4 characters).");
+          setAuthLoading(false);
+          return;
+        }
 
         try {
           const res = await fetch("/api/auth/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: regName, email: regEmail, password: authForm.password || "password123" })
+            body: JSON.stringify({ name: authForm.name.trim(), email: regEmail, password: regPass })
           });
           const data = await res.json();
-          if (res.ok && data.user) {
-            setCurrentUser(data.user);
-            setShowAuthModal(false);
-            showToast(`Account created! Welcome, ${data.user.name}`);
-            handleAnalyze(tickerInput || "AAPL", data.user.token);
-            return;
+          if (!res.ok) {
+            throw new Error(data.detail || "Registration failed.");
           }
-        } catch (err) {
-          console.warn("API Register fallback:", err);
-        }
 
-        const userObj = { name: regName, email: regEmail, token: `token-${Date.now()}` };
-        setCurrentUser(userObj);
-        setShowAuthModal(false);
-        showToast(`Account created! Welcome, ${userObj.name}`);
-        handleAnalyze(tickerInput || "AAPL", userObj.token);
-        setAuthLoading(false);
+          setCurrentUser(data.user);
+          setShowAuthModal(false);
+          showToast(`Account created! Welcome, ${data.user.name}`);
+          handleAnalyze(tickerInput || "AAPL", data.user.token);
+        } catch (err) {
+          setAuthError(err.message || "Registration failed.");
+        } finally {
+          setAuthLoading(false);
+        }
       };
 
       const handleDemoLogin = () => {

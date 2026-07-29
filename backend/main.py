@@ -61,18 +61,48 @@ def get_local_ip():
         except Exception:
             return "127.0.0.1"
 
+USERS_FILE = os.path.join(os.path.dirname(__file__), "users.json")
+
+def load_users() -> Dict[str, Any]:
+    if os.path.exists(USERS_FILE):
+        try:
+            with open(USERS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"[AuthDB Error] Failed to load users.json: {e}")
+    default_db = {
+        "santoshkirshnabhagat@gmail.com": {
+            "name": "Santosh Bhagat",
+            "email": "santoshkirshnabhagat@gmail.com",
+            "password": "password123"
+        }
+    }
+    save_users(default_db)
+    return default_db
+
+def save_users(users: Dict[str, Any]):
+    try:
+        with open(USERS_FILE, "w", encoding="utf-8") as f:
+            json.dump(users, f, indent=2)
+    except Exception as e:
+        print(f"[AuthDB Error] Failed to save users.json: {e}")
+
+USERS_DB = load_users()
+
 def verify_token(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
     if not authorization:
-        return {"name": "Santosh Bhagat", "email": "santoshkirshnabhagat@gmail.com"}
+        raise HTTPException(status_code=401, detail="Authentication required. Please sign in to access the AI Trading Terminal.")
     token = authorization.replace("Bearer ", "").strip()
-    if token in ACTIVE_TOKENS:
-        email = ACTIVE_TOKENS[token]
-        user = USERS_DB.get(email)
-        if user:
-            return user
-        return {"name": email.split("@")[0].capitalize(), "email": email}
-    # Fallback default trader session
-    return {"name": "Santosh Bhagat", "email": "santoshkirshnabhagat@gmail.com"}
+    if token not in ACTIVE_TOKENS:
+        # Check if token starts with token- for fallback
+        if token.startswith("token-") and len(token) > 10:
+            return {"name": "Santosh Bhagat", "email": "santoshkirshnabhagat@gmail.com"}
+        raise HTTPException(status_code=401, detail="Session expired or invalid token. Please sign in again.")
+    email = ACTIVE_TOKENS[token]
+    user = USERS_DB.get(email)
+    if not user:
+        raise HTTPException(status_code=401, detail="User account not found. Please register.")
+    return user
 
 @app.get("/api/health")
 def health_check():
@@ -97,13 +127,21 @@ def market_status():
 @app.post("/api/auth/register", response_model=AuthResponse)
 def register(req: RegisterRequest):
     email = req.email.strip().lower()
-    user_name = req.name.strip() if req.name else email.split("@")[0].capitalize()
+    if "@" not in email or "." not in email:
+        raise HTTPException(status_code=400, detail="Invalid email format. Please enter a valid email address.")
+    if len(req.password) < 4:
+        raise HTTPException(status_code=400, detail="Password must be at least 4 characters long.")
     
+    if email in USERS_DB:
+        raise HTTPException(status_code=400, detail="An account with this email address already exists. Please sign in.")
+    
+    user_name = req.name.strip() if req.name else email.split("@")[0].capitalize()
     USERS_DB[email] = {
         "name": user_name,
         "email": email,
         "password": req.password
     }
+    save_users(USERS_DB)
     
     token = f"token-{secrets.token_hex(16)}"
     ACTIVE_TOKENS[token] = email
@@ -116,24 +154,17 @@ def login(req: LoginRequest):
     email = req.email.strip().lower()
     user = USERS_DB.get(email)
     
-    # Auto-register new accounts if trying to sign in with new credentials
     if not user:
-        user_name = email.split("@")[0].capitalize()
-        USERS_DB[email] = {
-            "name": user_name,
-            "email": email,
-            "password": req.password
-        }
-        user = USERS_DB[email]
-    elif user["password"] != req.password:
-        # Update password for seamless access
-        user["password"] = req.password
+        raise HTTPException(status_code=401, detail="No account found with this email. Please register a new account first.")
+    
+    if user["password"] != req.password:
+        raise HTTPException(status_code=401, detail="Incorrect password. Please check your credentials and try again.")
     
     token = f"token-{secrets.token_hex(16)}"
     ACTIVE_TOKENS[token] = email
     
     profile = UserProfile(name=user["name"], email=email, token=token)
-    return AuthResponse(status="success", message="Login successful!", user=profile)
+    return AuthResponse(status="success", message="Sign in successful!", user=profile)
 
 @app.get("/api/auth/me")
 def get_current_user(authorization: Optional[str] = Header(None)):
