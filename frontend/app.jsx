@@ -981,6 +981,45 @@ function App() {
               </p>
             </div>
 
+            {/* DEVELOPER PROFILE CARD */}
+            <div className="p-8 rounded-3xl glass-card border border-indigo-500/30 space-y-6">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-0.5 shadow-xl shadow-indigo-500/30 flex-shrink-0">
+                  <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-heading font-black text-2xl text-cyan-400">
+                    SB
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-semibold uppercase">
+                    Lead Developer & Creator
+                  </div>
+                  <h3 className="text-2xl font-heading font-extrabold text-white">
+                    Santosh Bhagat
+                  </h3>
+                  <p className="text-sm text-indigo-300 font-medium">
+                    Student at <span className="text-white font-bold">NIAT Kolhapur</span>
+                  </p>
+                  <p className="text-xs text-slate-300 font-light leading-relaxed">
+                    Passionate AI & Software Engineering student studying at NIAT Kolhapur, specializing in building full-stack AI-driven web applications, autonomous LangChain agents, and real-time financial analytics platforms.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-800 text-xs font-mono">
+                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-400">Email ID:</span>
+                  <a href="mailto:santoshkirshnabhagat@gmail.com" className="text-cyan-400 font-bold hover:underline">
+                    santoshkirshnabhagat@gmail.com
+                  </a>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+                  <span className="text-slate-400">Institution:</span>
+                  <span className="text-emerald-400 font-bold">NIAT Kolhapur</span>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 rounded-2xl glass-card border border-slate-800 space-y-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center text-cyan-400 font-bold">01</div>
