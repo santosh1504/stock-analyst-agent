@@ -71,7 +71,14 @@ python run.py
 ```
 Open your browser at `http://localhost:8000`.
 
+## 👨‍💻 Author & Developer Profile
+
+- **Developer**: **Santosh Bhagat**
+- **Email ID**: [santoshkirshnabhagat@gmail.com](mailto:santoshkirshnabhagat@gmail.com)
+- **Institution**: **NIAT Kolhapur**
+- **GitHub**: [github.com/santosh1504/stock-analyst-agent](https://github.com/santosh1504/stock-analyst-agent)
+
 ---
 
 ## 📄 License
-MIT License. Made with ❤️ using React, FastAPI, LangChain, and Gemini AI.
+MIT License. Created with ❤️ by **Santosh Bhagat** (NIAT Kolhapur) using React, FastAPI, LangChain, and Gemini AI.
