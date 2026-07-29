@@ -144,7 +144,105 @@
 
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
-    const { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } = window.Recharts || {};
+
+    // SVG Vector Chart Component (100% reliable, zero external script dependency)
+    const StockAreaChart = ({ data, color = "#6366f1", height = 220 }) => {
+      const [hoverIndex, setHoverIndex] = useState(null);
+
+      if (!data || data.length === 0) return null;
+
+      const prices = data.map((d) => d.price);
+      const minP = Math.min(...prices) * 0.98;
+      const maxP = Math.max(...prices) * 1.02;
+      const range = maxP - minP || 1;
+
+      const width = 800;
+      const h = height;
+      const paddingX = 55;
+      const paddingTop = 25;
+      const paddingBottom = 35;
+
+      const points = data.map((d, i) => {
+        const x = paddingX + (i / (data.length - 1)) * (width - paddingX - 25);
+        const y = paddingTop + (1 - (d.price - minP) / range) * (h - paddingTop - paddingBottom);
+        return { x, y, date: d.date, price: d.price };
+      });
+
+      const pathD = points.reduce((acc, p, i) => (
+        i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`
+      ), "");
+
+      const fillD = `${pathD} L ${points[points.length - 1].x} ${h - paddingBottom} L ${points[0].x} ${h - paddingBottom} Z`;
+      const activePoint = hoverIndex !== null ? points[hoverIndex] : points[points.length - 1];
+
+      return (
+        <div className="w-full relative select-none">
+          <div className="flex items-center justify-between px-2 mb-2 text-xs font-mono">
+            <span className="text-slate-400">
+              Date: <span className="text-white font-bold">{activePoint.date}</span>
+            </span>
+            <span className="text-indigo-400 font-bold text-sm">
+              Price: ${activePoint.price.toFixed(2)}
+            </span>
+          </div>
+
+          <svg viewBox={`0 0 ${width} ${h}`} className="w-full h-full overflow-visible">
+            <defs>
+              <linearGradient id={`areaGrad-${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={color} stopOpacity={0.4} />
+                <stop offset="100%" stopColor={color} stopOpacity={0.0} />
+              </linearGradient>
+            </defs>
+
+            {[0, 0.33, 0.66, 1].map((pct, idx) => {
+              const y = paddingTop + pct * (h - paddingTop - paddingBottom);
+              const priceVal = (maxP - pct * range).toFixed(2);
+              return (
+                <g key={idx}>
+                  <line x1={paddingX} y1={y} x2={width - 25} y2={y} stroke="#1e293b" strokeDasharray="3 3" />
+                  <text x={paddingX - 8} y={y + 4} fill="#64748b" fontSize="11" fontFamily="monospace" textAnchor="end">
+                    ${priceVal}
+                  </text>
+                </g>
+              );
+            })}
+
+            <path d={fillD} fill={`url(#areaGrad-${color.replace('#','')})`} />
+            <path d={pathD} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+            {points.map((p, i) => (
+              <g 
+                key={i} 
+                className="cursor-pointer"
+                onMouseEnter={() => setHoverIndex(i)}
+                onMouseLeave={() => setHoverIndex(null)}
+              >
+                <circle 
+                  cx={p.x} 
+                  cy={p.y} 
+                  r={hoverIndex === i ? 7 : 4} 
+                  fill={hoverIndex === i ? "#38bdf8" : color} 
+                  stroke="#0f172a" 
+                  strokeWidth="2"
+                />
+                {(i === 0 || i === Math.floor(points.length / 2) || i === points.length - 1) && (
+                  <text 
+                    x={p.x} 
+                    y={h - 8} 
+                    fill="#64748b" 
+                    fontSize="11" 
+                    fontFamily="monospace" 
+                    textAnchor="middle"
+                  >
+                    {p.date.slice(5)}
+                  </text>
+                )}
+              </g>
+            ))}
+          </svg>
+        </div>
+      );
+    };
 
     const Icon = ({ name, className = "w-5 h-5" }) => {
       const icons = {
@@ -824,23 +922,11 @@
                           </span>
                         </div>
 
-                        <div className="h-44 w-full">
-                          {ResponsiveContainer ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                              <AreaChart data={[
-                                { d: '1', p: 120 }, { d: '2', p: 124 }, { d: '3', p: 122 },
-                                { d: '4', p: 129 }, { d: '5', p: 128 }, { d: '6', p: 135 }, { d: '7', p: 138 }
-                              ]}>
-                                <defs>
-                                  <linearGradient id="heroGradient" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                  </linearGradient>
-                                </defs>
-                                <Area type="monotone" dataKey="p" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#heroGradient)" />
-                              </AreaChart>
-                            </ResponsiveContainer>
-                          ) : <div className="h-full bg-slate-900/40 rounded-xl flex items-center justify-center text-xs text-slate-500">Loading Chart Engine...</div>}
+                        <div className="w-full pt-1">
+                          <StockAreaChart data={[
+                            { date: '07-20', price: 120 }, { date: '07-21', price: 124 }, { date: '07-22', price: 122 },
+                            { date: '07-23', price: 129 }, { date: '07-24', price: 128 }, { date: '07-25', price: 135 }, { date: '07-28', price: 138 }
+                          ]} color="#10b981" height={160} />
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 pt-2">
@@ -1097,27 +1183,8 @@
                         <span className="text-xs text-slate-400 font-mono">Interactive Chart</span>
                       </div>
 
-                      <div className="h-64 sm:h-72 w-full pt-2">
-                        {ResponsiveContainer ? (
-                          <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={analysisData.price_history}>
-                              <defs>
-                                <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
-                                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                                </linearGradient>
-                              </defs>
-                              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                              <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
-                              <YAxis domain={['auto', 'auto']} stroke="#64748b" fontSize={11} tickFormatter={(val) => `$${val}`} />
-                              <Tooltip 
-                                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }}
-                                formatter={(value) => [`$${value}`, 'Price']}
-                              />
-                              <Area type="monotone" dataKey="price" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
-                            </AreaChart>
-                          </ResponsiveContainer>
-                        ) : <div className="h-full bg-slate-900/40 rounded-xl flex items-center justify-center text-xs text-slate-500">Loading Chart Engine...</div>}
+                      <div className="w-full pt-2">
+                        <StockAreaChart data={analysisData.price_history} color="#6366f1" height={220} />
                       </div>
                     </div>
 

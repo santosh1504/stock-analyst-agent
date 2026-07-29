@@ -660,32 +660,15 @@ function App() {
                 {/* PRICE HISTORY CHART */}
                 <div className="p-6 rounded-2xl glass-card border border-slate-800 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <Icon name="trendingUp" className="w-5 h-5 text-indigo-400" />
-                      10-Day Closing Price Trend
-                    </h3>
+                      <h3 className="text-base font-bold text-white">10-Day Closing Price Trend</h3>
+                    </div>
                     <span className="text-xs text-slate-400 font-mono">Interactive Chart</span>
                   </div>
 
-                  <div className="h-64 sm:h-72 w-full pt-2">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={analysisData.price_history}>
-                        <defs>
-                          <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
-                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                        <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
-                        <YAxis domain={['auto', 'auto']} stroke="#64748b" fontSize={11} tickFormatter={(val) => `$${val}`} />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }}
-                          formatter={(value) => [`$${value}`, 'Price']}
-                        />
-                        <Area type="monotone" dataKey="price" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                  <div className="w-full pt-2">
+                    <StockAreaChart data={analysisData.price_history} color="#6366f1" height={220} />
                   </div>
                 </div>
 
