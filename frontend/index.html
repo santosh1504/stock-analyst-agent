@@ -125,6 +125,16 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #334155;
     }
+
+    /* Prevent Browser Auto-Fill Styling */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #020617 inset !important;
+      -webkit-text-fill-color: #ffffff !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
   </style>
 </head>
 <body class="bg-[#0b0f19] text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white">
@@ -647,13 +657,19 @@
                 )}
 
                 {/* Auth Form */}
-                <form onSubmit={(e) => { e.preventDefault(); authTab === "login" ? handleLogin() : handleRegister(); }} className="space-y-4 text-xs">
+                <form 
+                  autoComplete="off" 
+                  onSubmit={(e) => { e.preventDefault(); authTab === "login" ? handleLogin() : handleRegister(); }} 
+                  className="space-y-4 text-xs"
+                >
                   {authTab === "register" && (
                     <div>
                       <label className="block text-slate-400 font-mono uppercase mb-1">Full Name</label>
                       <input
                         required
                         type="text"
+                        name="auth_user_fullname_no_fill"
+                        autoComplete="off"
                         placeholder="Alex Trader"
                         value={authForm.name}
                         onChange={(e) => setAuthForm({ ...authForm, name: e.target.value })}
@@ -666,6 +682,8 @@
                     <input
                       required
                       type="email"
+                      name="auth_email_address_no_fill"
+                      autoComplete="off"
                       placeholder="trader@analyst.ai"
                       value={authForm.email}
                       onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })}
@@ -677,6 +695,8 @@
                     <input
                       required
                       type="password"
+                      name="auth_user_pass_no_fill"
+                      autoComplete="new-password"
                       placeholder="••••••••"
                       value={authForm.password}
                       onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
