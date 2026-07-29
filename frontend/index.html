@@ -1379,51 +1379,52 @@
 
             {/* ==================== ABOUT SECTION ==================== */}
             {activeTab === "about" && (
-              <div className="max-w-4xl mx-auto space-y-10">
-                <div className="space-y-4">
-                  <h2 className="text-3xl font-heading font-extrabold text-white">About Stock Trading Analyst Agent</h2>
-                  <p className="text-slate-300 text-base leading-relaxed font-light">
-                    This project combines modern quantitative technical indicators with state-of-the-art Generative AI using <span className="text-cyan-400 font-semibold">LangChain</span>, <span className="text-indigo-400 font-semibold">Google Gemini 2.5 Flash</span>, and real-time market data feeds from the <span className="text-emerald-400 font-semibold">Twelve Data API</span>.
-                  </p>
-                </div>
-
-                {/* DEVELOPER PROFILE CARD */}
-                <div className="p-8 rounded-3xl glass-card border border-indigo-500/30 space-y-6">
+              <div className="max-w-4xl mx-auto space-y-8">
+                {/* DEVELOPER PROFILE CARD (HERO HIGHLIGHT) */}
+                <div className="p-8 rounded-3xl glass-card border border-cyan-500/40 bg-gradient-to-r from-slate-900/90 via-indigo-950/40 to-slate-900/90 shadow-2xl shadow-cyan-500/10 space-y-6">
                   <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 p-0.5 shadow-xl shadow-indigo-500/30 flex-shrink-0">
-                      <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-heading font-black text-2xl text-cyan-400">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-indigo-500 via-cyan-400 to-emerald-400 p-1 shadow-xl shadow-cyan-500/20 flex-shrink-0">
+                      <div className="w-full h-full bg-slate-950 rounded-[12px] flex items-center justify-center font-heading font-black text-3xl text-cyan-400 tracking-wider">
                         SB
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-semibold uppercase">
+                    <div className="space-y-2.5">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 text-xs font-mono font-bold uppercase tracking-wider">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                         Lead Developer & Creator
                       </div>
-                      <h3 className="text-2xl font-heading font-extrabold text-white">
+                      <h2 className="text-3xl font-heading font-black text-white">
                         Santosh Bhagat
-                      </h3>
-                      <p className="text-sm text-indigo-300 font-medium">
-                        Student at <span className="text-white font-bold">NIAT Kolhapur</span>
+                      </h2>
+                      <p className="text-sm font-semibold text-indigo-300">
+                        Student at <span className="text-white font-extrabold underline decoration-cyan-400 decoration-2 underline-offset-4">NIAT Kolhapur</span>
                       </p>
-                      <p className="text-xs text-slate-300 font-light leading-relaxed">
-                        Passionate AI & Software Engineering student studying at NIAT Kolhapur, specializing in building full-stack AI-driven web applications, autonomous LangChain agents, and real-time financial analytics platforms.
+                      <p className="text-xs text-slate-300 font-light leading-relaxed max-w-2xl">
+                        Passionate AI & Software Engineering student studying at NIAT Kolhapur, specializing in building full-stack AI-driven web applications, autonomous LangChain trading agents, and real-time financial analytics platforms.
                       </p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-800 text-xs font-mono">
-                    <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+                    <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
                       <span className="text-slate-400">Email ID:</span>
                       <a href="mailto:santoshkirshnabhagat@gmail.com" className="text-cyan-400 font-bold hover:underline">
                         santoshkirshnabhagat@gmail.com
                       </a>
                     </div>
-                    <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
+                    <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between">
                       <span className="text-slate-400">Institution:</span>
-                      <span className="text-emerald-400 font-bold">NIAT Kolhapur</span>
+                      <span className="text-emerald-400 font-extrabold">NIAT Kolhapur</span>
                     </div>
                   </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-heading font-extrabold text-white">About Stock Trading Analyst Agent</h3>
+                  <p className="text-slate-300 text-sm leading-relaxed font-light">
+                    This project combines modern quantitative technical indicators with state-of-the-art Generative AI using <span className="text-cyan-400 font-semibold">LangChain</span>, <span className="text-indigo-400 font-semibold">Google Gemini 2.5 Flash</span>, and real-time market data feeds from the <span className="text-emerald-400 font-semibold">Twelve Data API</span>.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

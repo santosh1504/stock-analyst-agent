@@ -252,7 +252,11 @@ if os.path.exists(frontend_dir):
     def read_root():
         index_file = os.path.join(frontend_dir, "index.html")
         if os.path.exists(index_file):
-            return FileResponse(index_file)
+            response = FileResponse(index_file)
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            return response
         return JSONResponse({"message": "Frontend index.html not found. Place index.html in frontend/"})
 
 if __name__ == "__main__":
