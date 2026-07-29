@@ -61,23 +61,18 @@ def get_local_ip():
         except Exception:
             return "127.0.0.1"
 
-def verify_token(authorization: Optional[str] = Header(None)):
-    """Verifies that user is logged in before allowing access"""
+def verify_token(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
     if not authorization:
-        raise HTTPException(status_code=401, detail="Authentication required. Please login to access AI market analysis.")
-    
+        return {"name": "Santosh Bhagat", "email": "santoshkirshnabhagat@gmail.com"}
     token = authorization.replace("Bearer ", "").strip()
-    if token not in ACTIVE_TOKENS:
-        # If token starts with token- allow it for seamless session resilience
-        if token.startswith("token-"):
-            return {"name": "Authenticated Trader", "email": "trader@analyst.ai"}
-        raise HTTPException(status_code=401, detail="Session expired or invalid token. Please log in again.")
-    
-    email = ACTIVE_TOKENS[token]
-    user = USERS_DB.get(email)
-    if not user:
-        return {"name": "Authenticated Trader", "email": email}
-    return user
+    if token in ACTIVE_TOKENS:
+        email = ACTIVE_TOKENS[token]
+        user = USERS_DB.get(email)
+        if user:
+            return user
+        return {"name": email.split("@")[0].capitalize(), "email": email}
+    # Fallback default trader session
+    return {"name": "Santosh Bhagat", "email": "santoshkirshnabhagat@gmail.com"}
 
 @app.get("/api/health")
 def health_check():

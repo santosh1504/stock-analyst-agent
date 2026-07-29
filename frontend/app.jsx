@@ -62,6 +62,23 @@ function App() {
       return ["AAPL", "NVDA", "MSFT"];
     }
   });
+
+  // Authentication State
+  const DEFAULT_USER = {
+    name: "Santosh Bhagat",
+    email: "santoshkirshnabhagat@gmail.com",
+    token: "token-santosh-default"
+  };
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem("stock_user");
+      return saved ? JSON.parse(saved) : DEFAULT_USER;
+    } catch {
+      return DEFAULT_USER;
+    }
+  });
+
   const [recentSearches, setRecentSearches] = useState(() => {
     try {
       const saved = localStorage.getItem("recent_searches");
