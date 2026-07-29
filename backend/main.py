@@ -71,9 +71,9 @@ def load_users() -> Dict[str, Any]:
         except Exception as e:
             print(f"[AuthDB Error] Failed to load users.json: {e}")
     default_db = {
-        "santoshkirshnabhagat@gmail.com": {
-            "name": "Santosh Bhagat",
-            "email": "santoshkirshnabhagat@gmail.com",
+        "trader@analyst.ai": {
+            "name": "Demo Trader",
+            "email": "trader@analyst.ai",
             "password": "password123"
         }
     }
