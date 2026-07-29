@@ -390,14 +390,20 @@
             body: JSON.stringify({ ticker: symbol })
           });
           
-          const data = await res.json();
+          let data;
+          try {
+            data = await res.json();
+          } catch (parseErr) {
+            throw new Error("Server analysis temporarily unavailable. Please retry.");
+          }
+
           if (res.status === 401) {
             setCurrentUser(null);
             setShowAuthModal(true);
             throw new Error("Session expired. Please log in again.");
           }
           if (!res.ok) {
-            throw new Error(data.detail || "Failed to analyze stock ticker");
+            throw new Error(data.detail || data.message || "Failed to analyze stock ticker.");
           }
 
           setAnalysisData(data);
@@ -434,9 +440,15 @@
             },
             body: JSON.stringify({ stock1: compareStock1, stock2: compareStock2 })
           });
-          const data = await res.json();
+          let data;
+          try {
+            data = await res.json();
+          } catch (parseErr) {
+            throw new Error("Stock comparison temporarily unavailable. Please retry.");
+          }
+
           if (!res.ok) {
-            throw new Error(data.detail || "Stock comparison failed.");
+            throw new Error(data.detail || data.message || "Stock comparison failed.");
           }
           setCompareData(data);
         } catch (err) {
