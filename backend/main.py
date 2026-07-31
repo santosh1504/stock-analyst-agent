@@ -269,6 +269,61 @@ def compare_stocks(req: CompareRequest, authorization: Optional[str] = Header(No
         print(f"[API Error] /api/compare failed for {s1} vs {s2}: {e}")
         raise HTTPException(status_code=500, detail=f"Stock comparison failed for '{s1}' and '{s2}'.")
 
+# ==================== CONTACT MESSAGES STORAGE & DISPATCH ====================
+
+MESSAGES_FILE = os.path.join(os.path.dirname(__file__), "contact_messages.json")
+
+def load_messages() -> List[Dict[str, Any]]:
+    if os.path.exists(MESSAGES_FILE):
+        try:
+            with open(MESSAGES_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return []
+
+def save_messages(msgs: List[Dict[str, Any]]):
+    try:
+        with open(MESSAGES_FILE, "w", encoding="utf-8") as f:
+            json.dump(msgs, f, indent=2)
+    except Exception as e:
+        print(f"[Contact Error] Failed to save message: {e}")
+
+CONTACT_MESSAGES = load_messages()
+
+@app.post("/api/contact")
+def submit_contact_form(req: ContactRequest):
+    name = req.name.strip()
+    email = req.email.strip().lower()
+    msg = req.message.strip()
+    
+    if not name or not email or not msg:
+        raise HTTPException(status_code=400, detail="Name, email, and message are all required.")
+        
+    entry = {
+        "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "name": name,
+        "email": email,
+        "message": msg
+    }
+    CONTACT_MESSAGES.insert(0, entry)
+    save_messages(CONTACT_MESSAGES)
+    
+    print(f"[Contact Received] From {entry['name']} ({entry['email']}): {entry['message']}")
+    return {
+        "status": "success",
+        "message": "Thank you! Your message has been delivered directly to Santosh Bhagat."
+    }
+
+@app.get("/api/contact/messages")
+def get_contact_messages():
+    return {
+        "status": "success",
+        "recipient": "santoshkirshnabhagat@gmail.com (NIAT Kolhapur)",
+        "total_messages": len(CONTACT_MESSAGES),
+        "messages": CONTACT_MESSAGES
+    }
+
 # Mount Static Files (Frontend UI)
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
 if os.path.exists(frontend_dir):

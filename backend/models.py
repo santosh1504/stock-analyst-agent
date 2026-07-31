@@ -71,3 +71,9 @@ class CompareResponse(BaseModel):
     stronger_stock: str
     comparison_summary: str
     relative_advantage: List[str]
+
+class ContactRequest(BaseModel):
+    name: str = Field(..., example="John Doe")
+    email: str = Field(..., example="john@example.com")
+    message: str = Field(..., example="Great application!")
+
